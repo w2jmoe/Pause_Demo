@@ -10,8 +10,8 @@ import type { DemoPhase } from './demoPhase';
 
 const PAUSE_SECONDS = 5 * 60;
 const MAX_PAUSE_ROUNDS = 3;
-/** 触发句先在左侧露脸，再进入安全空间（演示观众需要先看到） */
-const PAUSE_NOTICE_MS = 1200;
+/** 触发句先在左侧露脸，再进入安全空间（演示观众需要先看清） */
+const PAUSE_NOTICE_MS = 2000;
 
 const emptyDetection: RiskDetectionResult = {
   categories: [],
