@@ -38,9 +38,12 @@ export const categoryHint: Record<RiskCategory, string> = {
 };
 
 export const categoryAdvice: Record<RiskCategory, string> = {
-  credential: '不要把验证码发给对方，自己打开官方 App 或网站核对。',
-  remoteAccess: '先别安装，也别允许对方控制你的电脑。',
-  money: '先别转账，换一个官方渠道重新核实。',
+  credential:
+    '不要把验证码或密码发给对方。正规平台不会在电话/聊天里向你索要验证码；把验证码给人，就等于把账号交给对方。请挂断或暂停后，自己打开官方 App 或官网查看是否有异常登录；若刚收到验证码短信，多半是有人在尝试登录，切勿回传。',
+  remoteAccess:
+    '先别安装对方发来的软件，也别允许远程控制。一旦连上，对方往往能直接操作你的电脑和账户。请结束当前要求，自行到官网核验；若已经装了，立即断开网络并卸载该软件，再修改相关账号密码。',
+  money:
+    '先别按对方给的账户或地址转账。「安全账户」「保证金」「临时保全」常是骗子收款话术，转出后很难追回。请通过官方客服或官方 App 重新核实；涉及加密资产时，切勿把币转到陌生人提供的钱包地址。',
 };
 
 function includesKeyword(text: string, keyword: string) {

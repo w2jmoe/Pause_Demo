@@ -9,7 +9,6 @@ type CallPanelProps = {
   messages: ScenarioMessage[];
   phase: DemoPhase;
   triggerTexts?: string[];
-  tryPreviewActive?: boolean;
 };
 
 function Avatar({ name, tone }: { name: string; tone: 'them' | 'me' }) {
@@ -81,16 +80,10 @@ export function CallPanel({
   messages,
   phase,
   triggerTexts = [],
-  tryPreviewActive = false,
 }: CallPanelProps) {
   const holding = phase === 'paused';
   const ended = phase === 'ended';
-  const focusClass =
-    tryPreviewActive && phase === 'idle'
-      ? ' is-dimmed'
-      : phase === 'monitoring' || phase === 'riskDetected'
-        ? ' is-focus'
-        : '';
+  const focusClass = phase === 'monitoring' || phase === 'riskDetected' ? ' is-focus' : '';
   const listRef = useRef<HTMLDivElement>(null);
   const latestTrigger = triggerTexts[triggerTexts.length - 1] ?? '';
 

@@ -651,6 +651,7 @@ h1 {
 
 .advice-box li {
   color: #2a2926;
+  line-height: 1.55;
 }
 
 .risk-line {
@@ -684,77 +685,6 @@ h1 {
   margin: 0;
   padding-left: 18px;
   color: #2a2926;
-}
-
-.try-box {
-  width: min(1440px, 100%);
-  display: grid;
-  gap: 6px;
-  padding: 10px 16px 12px;
-  background: #f7f5f2;
-  border: 1px solid #e2dcd3;
-}
-
-.try-heading {
-  display: grid;
-  gap: 2px;
-}
-
-.try-box h2 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 560;
-}
-
-.try-lead,
-.try-box p {
-  margin: 0;
-  color: #5d5852;
-  font-size: 13px;
-}
-
-.try-row {
-  display: flex;
-  gap: 10px;
-}
-
-.try-box input {
-  flex: 1;
-  min-width: 0;
-  padding: 10px 12px;
-  border: 1px solid #ddd6cc;
-  background: #fffdfb;
-  color: #2a2926;
-}
-
-.try-box button {
-  min-width: 88px;
-}
-
-.try-result {
-  display: grid;
-  gap: 2px;
-}
-
-.try-result-title {
-  color: #2f4a42;
-  font-size: 14px;
-  font-weight: 560;
-}
-
-.try-result-detail,
-.try-hint {
-  margin: 0;
-  color: #5d5852;
-  font-size: 13px;
-}
-
-.try-result.is-pause_triggered .try-result-title {
-  color: #2f4a42;
-}
-
-.try-result.is-risk_detected .try-result-title {
-  color: #6a5a3a;
 }
 
 .site-credit {

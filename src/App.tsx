@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { CallPanel } from './components/CallPanel';
 import { ScenarioPicker } from './components/ScenarioPicker';
 import { TopBar } from './components/TopBar';
-import { TryPauseBox } from './components/TryPauseBox';
 import { UserPanel } from './components/UserPanel';
 import { getScenario, scenarios, themText, type ScenarioId } from './data/scenarios';
 import { detectPauseTrigger, detectRisk, type RiskDetectionResult } from './rules/riskRules';
@@ -33,11 +32,6 @@ type PendingPause = {
   nextRound: number;
 };
 
-type TryPreview = {
-  text: string;
-  detection: RiskDetectionResult;
-};
-
 export default function App() {
   const [scenarioId, setScenarioId] = useState<ScenarioId>('crypto-support-scam');
   const [phase, setPhase] = useState<DemoPhase>('idle');
@@ -55,7 +49,6 @@ export default function App() {
   /** 每次暂停对应的对方原话（强制结束时回顾） */
   const [pauseHistory, setPauseHistory] = useState<string[][]>([]);
   const [pendingPause, setPendingPause] = useState<PendingPause | null>(null);
-  const [tryPreview, setTryPreview] = useState<TryPreview | null>(null);
 
   const scenario = getScenario(scenarioId);
   const displayMessages = scenario.messages.slice(0, displayCount);
@@ -163,7 +156,6 @@ export default function App() {
     setTriggerTexts([]);
     setPauseHistory([]);
     setPendingPause(null);
-    setTryPreview(null);
   }
 
   function startDemo() {
@@ -188,15 +180,13 @@ export default function App() {
   const footerLabel =
     phase === 'ended' ? '返回开始' : phase === 'paused' ? '安全审查中' : phase === 'idle' ? '开始演示' : '演示进行中';
 
-  const activeGuide = tryPreview && phase === 'idle'
-    ? '看右侧「你的视角」：这是即时检测结果'
-    : pendingPause
-      ? '看左侧「沟通画面」：对方刚提出高风险要求'
-      : resumeFromCount !== null && (phase === 'monitoring' || phase === 'riskDetected')
-        ? '看左侧「沟通画面」：双方继续对话'
-        : forcedEnd && phase === 'ended'
-          ? '已 3 次发现高风险，沟通已强制结束'
-          : guideText[phase];
+  const activeGuide = pendingPause
+    ? '看左侧「沟通画面」：对方刚提出高风险要求'
+    : resumeFromCount !== null && (phase === 'monitoring' || phase === 'riskDetected')
+      ? '看左侧「沟通画面」：双方继续对话'
+      : forcedEnd && phase === 'ended'
+        ? '已 3 次发现高风险，沟通已强制结束'
+        : guideText[phase];
 
   return (
     <main className="app">
@@ -219,7 +209,6 @@ export default function App() {
             themName={scenario.themName}
             meName={scenario.meName}
             triggerTexts={phase === 'paused' || forcedEnd ? triggerTexts : []}
-            tryPreviewActive={Boolean(tryPreview && phase === 'idle')}
           />
           <UserPanel
             phase={phase}
@@ -230,7 +219,6 @@ export default function App() {
             pauseHistory={pauseHistory}
             forcedEnd={forcedEnd}
             pauseRound={pauseRound}
-            tryPreview={tryPreview}
             onExtend={() => setRemainingSeconds((seconds) => seconds + PAUSE_SECONDS)}
             onRequestReturn={() => setConfirmReturn(true)}
             onContinueCall={continueCall}
@@ -249,12 +237,6 @@ export default function App() {
           </button>
         </footer>
       </section>
-      <TryPauseBox
-        disabled={phase !== 'idle'}
-        onDetect={(payload) => {
-          setTryPreview(payload);
-        }}
-      />
       <p className="site-credit">
         <a href="mailto:w2jmoe@gmail.com">w2jmoe@gmail.com</a>
         <span aria-hidden="true"> · </span>
