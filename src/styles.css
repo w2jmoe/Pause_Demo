@@ -272,18 +272,134 @@ h1 {
   overscroll-behavior: contain;
 }
 
-.takeover-panel {
-  display: grid;
-  gap: 10px;
-  align-content: start;
-  flex: 1;
-  padding: 18px 16px;
-  background: #eef4f1;
-  border: 1px solid #2f4a42;
+/*
+ * 布局最高原则（禁止再犯裁切）：
+ * 1. 任何可能变长的面板正文，必须可纵向滚动看到全文。
+ * 2. 禁止对正文容器只用 overflow:hidden 把字裁掉。
+ * 3. 父级用 flex 列 + min-height:0；正文统一用 .panel-scroll。
+ */
+.panel-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
-.takeover-panel .message {
-  max-width: 34em;
+.takeover-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  /* 仅裁切绝对定位遮罩的外框；遮罩内部必须可滚动 */
+  overflow: hidden;
+}
+
+.takeover-stage .chat-list.is-frozen {
+  position: absolute;
+  inset: 0;
+  height: auto;
+  filter: grayscale(0.35);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.takeover-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: safe center;
+  gap: 0;
+  padding: 16px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  background: rgba(18, 22, 20, 0.78);
+  color: #f4f2ee;
+}
+
+.takeover-mask.is-ended {
+  background: rgba(18, 22, 20, 0.86);
+}
+
+.takeover-core {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+  width: min(28em, 100%);
+  margin: auto 0;
+  padding: 8px 4px 20px;
+  text-align: center;
+}
+
+.takeover-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  letter-spacing: 0.08em;
+  font-size: 13px;
+  font-weight: 560;
+  color: rgba(244, 242, 238, 0.88);
+}
+
+.takeover-mark {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #d7e3dd;
+  box-shadow: 0 0 0 3px rgba(215, 227, 221, 0.25);
+}
+
+.pause-glyph {
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  height: 36px;
+  margin: 6px 0 2px;
+}
+
+.pause-glyph span {
+  display: block;
+  width: 10px;
+  border-radius: 2px;
+  background: #f4f2ee;
+}
+
+.takeover-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+
+.takeover-sub,
+.takeover-reply,
+.takeover-intercept {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: rgba(244, 242, 238, 0.78);
+}
+
+.takeover-reply {
+  margin-top: 4px;
+  padding: 8px 12px;
+  border: 1px solid rgba(244, 242, 238, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(244, 242, 238, 0.92);
+}
+
+.takeover-intercept {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  color: rgba(244, 242, 238, 0.62);
+  font-size: 12px;
 }
 
 .chat-row {
@@ -441,7 +557,9 @@ h1 {
   overflow-x: hidden;
   overflow-y: auto;
   padding-right: 4px;
+  padding-bottom: 8px;
   overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .safety-grid {
@@ -718,6 +836,14 @@ button.quiet {
   .safety-scroll {
     overflow: visible;
     flex: none;
+  }
+
+  .takeover-stage {
+    min-height: 360px;
+  }
+
+  .takeover-mask {
+    overflow-y: auto;
   }
 
   .call-panel {
