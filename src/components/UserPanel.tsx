@@ -1,7 +1,12 @@
 import type { DemoPhase } from '../demoPhase';
-import { categoryHint, categoryLabel, detectRisk, type RiskDetectionResult } from '../rules/riskRules';
+import { categoryAdvice, categoryHint, categoryLabel, detectRisk, type RiskDetectionResult } from '../rules/riskRules';
 import { HighlightedQuote } from './HighlightedQuote';
 import { SafetySpace } from './SafetySpace';
+
+type TryPreview = {
+  text: string;
+  detection: RiskDetectionResult;
+};
 
 type UserPanelProps = {
   phase: DemoPhase;
@@ -12,6 +17,7 @@ type UserPanelProps = {
   pauseHistory: string[][];
   forcedEnd: boolean;
   pauseRound: number;
+  tryPreview: TryPreview | null;
   onExtend: () => void;
   onRequestReturn: () => void;
   onContinueCall: () => void;
@@ -29,6 +35,7 @@ export function UserPanel({
   pauseHistory,
   forcedEnd,
   pauseRound,
+  tryPreview,
   onExtend,
   onRequestReturn,
   onContinueCall,
@@ -113,6 +120,63 @@ export function UserPanel({
     );
   }
 
+  if (phase === 'idle' && tryPreview) {
+    const { text, detection: preview } = tryPreview;
+    const names = preview.categories.map((category) => categoryLabel[category]).join('、');
+    const title =
+      preview.level === 'none'
+        ? '未发现高风险要求'
+        : preview.level === 'pause_triggered'
+          ? `触发 PAUSE：${names}`
+          : `风险提示：${names}`;
+    const detail =
+      preview.level === 'none'
+        ? '这句话不会触发提示，也不会进入安全空间。'
+        : preview.level === 'pause_triggered'
+          ? '在主演示对话中，这类句子会进入安全空间。'
+          : '只会提醒，还不会暂停沟通。';
+
+    return (
+      <section className="panel user-panel is-focus" aria-label="你的视角">
+        <div className="panel-heading">
+          <div>
+            <p className="view-kicker">你的视角</p>
+            <h2>安全提示</h2>
+            <p className="quiet-note">只有你能看到 · 检测结果</p>
+          </div>
+          <p>已检测</p>
+        </div>
+        <div className="safety-scroll">
+          <div className="safety-copy appear">
+            <h2 className="safety-title">先停一下</h2>
+            <div className="trigger-quotes">
+              <p className="trigger-quote-label">你输入：</p>
+              <HighlightedQuote text={text} keywords={preview.matchedKeywords} />
+            </div>
+            <p className={`risk-hint try-level-${preview.level}`}>{title}</p>
+            <p className="safety-note">{detail}</p>
+            {preview.matchedKeywords.length > 0 ? (
+              <p className="quiet-note">命中：{preview.matchedKeywords.slice(0, 4).join('、')}</p>
+            ) : null}
+            {preview.categories.length > 0 ? (
+              <div className="advice-box">
+                <p className="pause-subtitle">建议</p>
+                <ul>
+                  {preview.categories.map((category) => (
+                    <li key={category}>
+                      <strong>{categoryLabel[category]}：</strong>
+                      {categoryAdvice[category]}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   const status = phase === 'riskDetected' ? '发现风险' : phase === 'monitoring' ? '正在观察' : '正常';
   const hints = detection.categories.map((category) => categoryHint[category]);
   const focusClass = phase === 'riskDetected' ? ' is-focus' : phase === 'monitoring' ? ' is-dimmed' : '';
@@ -126,11 +190,13 @@ export function UserPanel({
           <p className="quiet-note">只有你能看到</p>
         </div>
       </div>
-      <div className="safety-copy">
-        <h2 className="safety-title">先停一下</h2>
-        <p className="safety-note">危险操作发生前，先给你一点判断时间。</p>
-        <p className="status-line">状态：{status}</p>
-        {phase === 'riskDetected' ? <p className="risk-hint appear">发现：{hints.join('、')}</p> : null}
+      <div className="safety-scroll">
+        <div className="safety-copy">
+          <h2 className="safety-title">先停一下</h2>
+          <p className="safety-note">危险操作发生前，先给你一点判断时间。</p>
+          <p className="status-line">状态：{status}</p>
+          {phase === 'riskDetected' ? <p className="risk-hint appear">风险提示：{hints.join('、')}</p> : null}
+        </div>
       </div>
     </section>
   );

@@ -1,32 +1,34 @@
 import { useState } from 'react';
-import { categoryLabel, detectRisk, type RiskDetectionResult } from '../rules/riskRules';
+import { detectRisk, type RiskDetectionResult } from '../rules/riskRules';
 
-function describeResult(result: RiskDetectionResult) {
-  if (result.level === 'none') {
-    return '正常，不触发 PAUSE';
-  }
+type TryPauseBoxProps = {
+  disabled?: boolean;
+  onDetect: (payload: { text: string; detection: RiskDetectionResult } | null) => void;
+};
 
-  const names = result.categories.map((category) => categoryLabel[category]).join('、');
-  return result.level === 'pause_triggered' ? `触发 PAUSE：${names}` : `发现：${names}`;
-}
-
-export function TryPauseBox() {
+export function TryPauseBox({ disabled = false, onDetect }: TryPauseBoxProps) {
   const [text, setText] = useState('');
-  const [result, setResult] = useState<RiskDetectionResult | null>(null);
 
   function handleDetect() {
-    const value = text.trim();
-    if (!value) {
-      setResult(null);
+    if (disabled) {
       return;
     }
 
-    setResult(detectRisk(value));
+    const value = text.trim();
+    if (!value) {
+      onDetect(null);
+      return;
+    }
+
+    onDetect({ text: value, detection: detectRisk(value) });
   }
 
   return (
     <section className="try-box" aria-label="试试 PAUSE">
-      <h2>试试 PAUSE</h2>
+      <div className="try-heading">
+        <h2>试试 PAUSE</h2>
+        <p className="try-lead">输入一句话点检测，结果会显示在右侧「你的视角」。单一风险只提示；多类风险或带紧迫措辞才会触发 PAUSE。</p>
+      </div>
       <div className="try-row">
         <input
           value={text}
@@ -36,14 +38,17 @@ export function TryPauseBox() {
               handleDetect();
             }
           }}
-          placeholder="输入一句话，例如：请把验证码告诉我。"
+          placeholder="例如：请把验证码告诉我 / 请立即转账否则冻结"
           aria-label="风险检测输入"
+          disabled={disabled}
         />
-        <button type="button" onClick={handleDetect}>
+        <button type="button" onClick={handleDetect} disabled={disabled}>
           检测
         </button>
       </div>
-      <p className="try-result">{text.trim() && result ? describeResult(result) : '结果会显示在这里'}</p>
+      <p className="try-hint">
+        {disabled ? '演示进行中，请先点「重置」后再检测' : '检测后请看右侧高亮区域'}
+      </p>
     </section>
   );
 }
