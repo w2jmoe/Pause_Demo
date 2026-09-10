@@ -1,5 +1,5 @@
 import type { DemoPhase } from '../demoPhase';
-import { categoryHint, categoryLabel, detectRisk, type RiskDetectionResult } from '../rules/riskRules';
+import { categoryHint, categoryLabel, detectRisk, type RiskCategory, type RiskDetectionResult } from '../rules/riskRules';
 import { HighlightedQuote } from './HighlightedQuote';
 import { SafetySpace } from './SafetySpace';
 
@@ -12,6 +12,7 @@ type UserPanelProps = {
   pauseHistory: string[][];
   forcedEnd: boolean;
   pauseRound: number;
+  adviceByCategory?: Partial<Record<RiskCategory, string>>;
   onExtend: () => void;
   onRequestReturn: () => void;
   onContinueCall: () => void;
@@ -29,6 +30,7 @@ export function UserPanel({
   pauseHistory,
   forcedEnd,
   pauseRound,
+  adviceByCategory,
   onExtend,
   onRequestReturn,
   onContinueCall,
@@ -44,6 +46,7 @@ export function UserPanel({
         confirmReturn={confirmReturn}
         triggerTexts={triggerTexts}
         pauseRound={pauseRound}
+        adviceByCategory={adviceByCategory}
         onExtend={onExtend}
         onRequestReturn={onRequestReturn}
         onContinueCall={onContinueCall}

@@ -1,4 +1,4 @@
-import { categoryAdvice, categoryLabel, detectRisk, type RiskDetectionResult } from '../rules/riskRules';
+import { categoryLabel, detectRisk, resolveCategoryAdvice, type RiskCategory, type RiskDetectionResult } from '../rules/riskRules';
 import { HighlightedQuote } from './HighlightedQuote';
 import { PauseCountdown } from './PauseCountdown';
 
@@ -8,6 +8,7 @@ type SafetySpaceProps = {
   confirmReturn: boolean;
   triggerTexts: string[];
   pauseRound: number;
+  adviceByCategory?: Partial<Record<RiskCategory, string>>;
   onExtend: () => void;
   onRequestReturn: () => void;
   onContinueCall: () => void;
@@ -21,6 +22,7 @@ export function SafetySpace({
   confirmReturn,
   triggerTexts,
   pauseRound,
+  adviceByCategory,
   onExtend,
   onRequestReturn,
   onContinueCall,
@@ -69,7 +71,7 @@ export function SafetySpace({
                 {categories.map((category) => (
                   <li key={category}>
                     <strong>{categoryLabel[category]}：</strong>
-                    {categoryAdvice[category]}
+                    {resolveCategoryAdvice(category, adviceByCategory)}
                   </li>
                 ))}
               </ul>

@@ -33,7 +33,7 @@ type PendingPause = {
 };
 
 export default function App() {
-  const [scenarioId, setScenarioId] = useState<ScenarioId>('crypto-support-scam');
+  const [scenarioId, setScenarioId] = useState<ScenarioId>('acquaintance-urgent-transfer');
   const [phase, setPhase] = useState<DemoPhase>('idle');
   /** 左侧实际展示到的消息数 */
   const [displayCount, setDisplayCount] = useState(0);
@@ -219,6 +219,7 @@ export default function App() {
             pauseHistory={pauseHistory}
             forcedEnd={forcedEnd}
             pauseRound={pauseRound}
+            adviceByCategory={scenario.adviceByCategory}
             onExtend={() => setRemainingSeconds((seconds) => seconds + PAUSE_SECONDS)}
             onRequestReturn={() => setConfirmReturn(true)}
             onContinueCall={continueCall}

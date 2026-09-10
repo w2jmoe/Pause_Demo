@@ -1,4 +1,6 @@
-export type ScenarioId = 'crypto-support-scam' | 'fake-job-interview';
+import type { RiskCategory } from '../rules/riskRules';
+
+export type ScenarioId = 'acquaintance-urgent-transfer' | 'crypto-support-scam' | 'fake-job-interview';
 
 export type MessageSide = 'them' | 'me';
 
@@ -18,6 +20,8 @@ export type Scenario = {
   callerLabel: string;
   themName: string;
   meName: string;
+  /** 本场景触发后，按风险类别给出的对应建议（优先于通用文案） */
+  adviceByCategory: Partial<Record<RiskCategory, string>>;
   messages: ScenarioMessage[];
 };
 
@@ -29,13 +33,132 @@ export type Scenario = {
  */
 export const scenarios: Scenario[] = [
   {
+    id: 'acquaintance-urgent-transfer',
+    title: '冒充熟人 / 领导紧急转账',
+    subtitle: '换号求助 + 紧急转账',
+    description: '对方自称领导换号，用信任与紧迫感催促马上转账。',
+    callerLabel: '对方 / 来电方',
+    themName: '周总',
+    meName: '我',
+    adviceByCategory: {
+      money:
+        '先别转账。对方用新号码自称领导要钱，是常见骗术。请用你通讯录里原来的号码回拨或发短信核实，也可以问清楚行程的同事、助理；不要只凭头像、自称或这通新聊天就转出。',
+    },
+    messages: [
+      {
+        id: 'acq-1',
+        side: 'them',
+        speaker: '周总',
+        text: '小武，我是周总。手机刚才进水了，临时用助理这个号找你，别存错了。',
+        delayMs: 1100,
+      },
+      {
+        id: 'acq-2',
+        side: 'me',
+        speaker: '我',
+        text: '周总？您怎么用这个号发消息？',
+        delayMs: 1500,
+      },
+      {
+        id: 'acq-3',
+        side: 'them',
+        speaker: '周总',
+        text: '我在外面见客户，有笔材料费要先垫一下，回头公司走报销给你。',
+        delayMs: 1800,
+      },
+      {
+        id: 'acq-4',
+        side: 'me',
+        speaker: '我',
+        text: '多少？按平时流程走可以吗？',
+        delayMs: 1400,
+      },
+      {
+        id: 'acq-5',
+        side: 'them',
+        speaker: '周总',
+        text: '流程来不及了，客户这边卡着。你先别打电话，我信号不好，也免得对面听见。',
+        delayMs: 2000,
+      },
+      {
+        id: 'acq-6',
+        side: 'them',
+        speaker: '周总',
+        text: '你一向办事靠得住，这事就拜托你了，别让客户觉得我们不靠谱。',
+        delayMs: 1800,
+      },
+      // 第 1 次暂停：转账 + 紧迫
+      {
+        id: 'acq-7',
+        side: 'them',
+        speaker: '周总',
+        text: '马上帮我转账 3200 元到这个账户：招商银行 6225 8801 3366 3188，户名写周明轩，转完先回我一声。',
+        delayMs: 2400,
+      },
+      // —— 返回沟通后 ——
+      {
+        id: 'acq-8',
+        side: 'them',
+        speaker: '周总',
+        text: '小武？客户还在等，你动作快一点。',
+        delayMs: 1600,
+      },
+      {
+        id: 'acq-9',
+        side: 'me',
+        speaker: '我',
+        text: '周总，我再核实一下这个账户。',
+        delayMs: 1500,
+      },
+      {
+        id: 'acq-10',
+        side: 'them',
+        speaker: '周总',
+        text: '你再拖，下午签约就黄了。别让我在客户面前难看。',
+        delayMs: 1800,
+      },
+      // 第 2 次暂停
+      {
+        id: 'acq-11',
+        side: 'them',
+        speaker: '周总',
+        text: '现在就处理，立即转账，转完把截图发给我。',
+        delayMs: 2200,
+      },
+      // —— 再次返回 ——
+      {
+        id: 'acq-12',
+        side: 'them',
+        speaker: '周总',
+        text: '怎么还没动静？其他同事都在盯着进度。',
+        delayMs: 1600,
+      },
+      // 第 3 次暂停 → 强制结束
+      {
+        id: 'acq-13',
+        side: 'them',
+        speaker: '周总',
+        text: '马上打款到刚才那个账户，否则这笔单子今晚就黄了。',
+        delayMs: 2200,
+      },
+    ],
+  },
+  {
     id: 'crypto-support-scam',
     title: '加密资产客服诈骗',
-    subtitle: 'Fake Support / Crypto Scam',
+    subtitle: '假客服 + 验证码 / 远程',
     description: '假客服先自报家门、核对信息建立信任，再逐步要验证码、远程协助和转账。',
     callerLabel: '对方 / 来电方',
     themName: 'Google 支持 · 陈工',
     meName: '我',
+    adviceByCategory: {
+      credential:
+        '不要把验证码或密码发给对方。正规平台不会在电话/聊天里向你索要验证码。请自己打开官方 App 或官网查看是否有异常登录；若刚收到验证码短信，切勿回传。',
+      remoteAccess:
+        '先别安装 AnyDesk 等远程工具，也别把设备码发给对方。一旦连上，对方往往能直接操作你的电脑和账户。请结束当前要求，自行到官网核验；若已安装，立即断网卸载并改密。',
+      money:
+        '先别转到对方给的「安全钱包」或地址。假客服常用「临时保全」话术骗你转出资产。请自己打开官方 App 或官网核实账户状态，切勿按聊天里的地址转币。',
+    },
     messages: [
       {
         id: 'crypto-1',
@@ -55,7 +178,7 @@ export const scenarios: Scenario[] = [
         id: 'crypto-3',
         side: 'them',
         speaker: '陈工',
-        text: '系统会按注册邮箱推送。我先核对一下：您的邮箱是不是尾号 6，常用名是不是小周？昨晚新加坡方向有过一次登录尝试。',
+        text: '系统会按注册邮箱推送。我先核对一下：您的邮箱是不是尾号 6，常用名是不是小武？昨晚新加坡方向有过一次登录尝试。',
         delayMs: 2200,
       },
       {
@@ -143,7 +266,7 @@ export const scenarios: Scenario[] = [
         id: 'crypto-15',
         side: 'them',
         speaker: '陈工',
-        text: '小周？个案还挂着，您怎么又不说话了？',
+        text: '小武？个案还挂着，您怎么又不说话了？',
         delayMs: 1700,
       },
       {
@@ -180,11 +303,17 @@ export const scenarios: Scenario[] = [
   {
     id: 'fake-job-interview',
     title: '虚假招聘面试',
-    subtitle: 'Fake Job Interview',
+    subtitle: '假招聘 + 安装 / 保证金',
     description: '假 HR 先恭喜、核对简历并营造稀缺感，再逐步要安装客户端、远程协助和保证金。',
     callerLabel: '对方 / 招聘方',
     themName: '星启科技 · 林 HR',
     meName: '我',
+    adviceByCategory: {
+      remoteAccess:
+        '先别安装对方发来的客户端，也别允许远程访问。正规面试很少要求你装陌生软件并交出电脑控制权。请回到招聘平台或公司官网核实岗位与面试安排；若已安装，立即断网卸载。',
+      money:
+        '先别交「岗位保证金」或按对方账户转账。正规招聘几乎不会在入职前让你私下打款。请通过招聘平台官方入口或公司公示联系方式核实，不要按聊天里的个人账户汇款。',
+    },
     messages: [
       {
         id: 'job-1',
